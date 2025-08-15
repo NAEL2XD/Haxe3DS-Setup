@@ -9,7 +9,8 @@ jsonStruct = {
     "settings": {
         "3dsIP": "0.0.0.0",
         "deleteTempFiles": False,
-        "makeAs": "cia"
+        "makeAs": "cia",
+        "libraries": ["haxe3ds"]
     },
     "metadata": {
         "title": "Haxe3DS",
@@ -46,14 +47,16 @@ options:
         with open("3dsSettings.json", "r") as f:
             jsonStruct = json.load(f)
 
-        if not os.path.exists("build.hxml"):
-            with open("build.hxml", "w") as f:
-                f.write("""-cp source
+        with open("build.hxml", "w") as f:
+            f.write(f"""-cp source
 -main Main
 
--lib haxe3ds
 -lib reflaxe.cpp
+""")
+            for libs in jsonStruct["settings"]["libraries"]:
+                f.write(f"-lib {libs}\n")
 
+            f.write("""
 -D cpp-output=output
 -D mainClass=Main
 -D cxx-no-null-warnings
@@ -123,3 +126,4 @@ options:
 
 
         sys.exit(0)
+
