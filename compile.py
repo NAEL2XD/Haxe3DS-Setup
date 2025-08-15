@@ -39,7 +39,7 @@ options:
     elif "-c" in arg:
         oldTime = time.time()
         
-        os.system("cls")
+        os.system("clear")
         if not os.path.exists("3dsSettings.json"):
             print("3dsSettings.json doesn't exist!! Consider generating the Json!")
             sys.exit(1)
@@ -76,10 +76,10 @@ options:
         ]
 
         print("Revamping files to make it compatible with C++...")
-        os.system('xcopy /E "./assets" "./output" /Y ')
+        shutil.copytree("assets", "output/", dirs_exist_ok=True)
         for files in glob.glob("output/src/**"):
             # skip files starting with "haxe_"
-            if files.split("\\")[1].startswith("haxe_"):
+            if files.split("/")[2].startswith("haxe_"):
                 continue
 
             f = open(files, "r")
@@ -107,23 +107,23 @@ options:
             with open(f"output/{file}", "w") as f:
                 f.write(c)
 
-        print("Done!")
+        print("Done! Compiling...")
 
         make = jsonStruct["settings"]["makeAs"]
-        if os.system(f"cd output & make {make}") != 0:
+        os.chdir("output")
+        if os.system(f"make {make}") != 0:
             print("Failed to compile!")
             sys.exit(1)
 
+        os.chdir("output")
         print(f"Successfully Compiled in {round(time.time() - oldTime, 5)} seconds!!")
         ip:str = jsonStruct["settings"]["3dsIP"]
         if len(ip) > 7 and len(ip.split(".")) == 4:
             if make == "3dsx":
-                os.system(f"cd output/output & 3dslink -a {ip} output.3dsx")
+                os.system(f"3dslink -a {ip} output.3dsx")
             else:
-                os.system(f"curl --upload-file output/output/output.{make} \"ftp://{ip}:5000/cia/\"")
+                os.system(f"curl --upload-file output.{make} \"ftp://{ip}:5000/cia/\"")
         else:
-            os.system(f"cd output/output & output.3dsx")
-
+            os.system(f"output.3dsx")
 
         sys.exit(0)
-
