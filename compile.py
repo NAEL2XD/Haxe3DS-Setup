@@ -51,6 +51,7 @@ options:
                 f.write("""-cp source
 -main Main
 
+-lib haxe3ds
 -lib reflaxe.cpp
 
 -D cpp-output=output
@@ -119,5 +120,6 @@ options:
                 os.system(f"curl --upload-file output/output/output.{make} \"ftp://{ip}:5000/cia/\"")
         else:
             os.system(f"cd output/output & output.3dsx")
+
 
         sys.exit(0)
