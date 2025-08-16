@@ -39,7 +39,6 @@ options:
     elif "-c" in arg:
         oldTime = time.time()
         
-        os.system("clear")
         if not os.path.exists("3dsSettings.json"):
             print("3dsSettings.json doesn't exist!! Consider generating the Json!")
             sys.exit(1)
@@ -97,6 +96,18 @@ options:
 
             with open(files, "w") as f:
                 f.write('\n'.join(c))
+
+        for libs in jsonStruct["settings"]["libraries"]:
+            v = ""
+            with open(f".haxelib/{libs}/.current") as f:
+                v = f.read()
+
+            # don't judge me pls
+            for cpp in glob.glob(f".haxelib/{libs}/{v}/{libs}/**", recursive=True):
+                if cpp.endswith(".cpp") or cpp.endswith(".h"):
+                    fl = cpp.split("/")
+                    fl = fl[len(fl)-1]
+                    shutil.copyfile(cpp, f'output/src/{fl}' if fl.endswith(".cpp") else f'output/include/{fl}')
 
         for file in ["Makefile", "resources/AppInfo"]:
             c = open(f"output/{file}", "r").read()
